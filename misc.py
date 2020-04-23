@@ -1,5 +1,6 @@
 from PIL import Image
 import os
+import cv2
 
 def generate_id(name):
     id = "_"
@@ -17,7 +18,13 @@ def get_video_rotation(path):
     os.system(f'"exiftool.exe" -s -S -Rotation {path} > {exit_file}')
     f = open(exit_file,"r")
     rotation = int(f.read())
+    
+    if (rotation == 270):
+        rotation = cv2.ROTATE_90_COUNTERCLOCKWISE
+    elif (rotation == 90):
+        rotation = cv2.ROTATE_90_CLOCKWISE
+    elif(rotation == 180):
+        rotation = cv2.ROTATE_180
+
     f.close()
     return rotation
-
-print(get_video_rotation("video____.mp4"))

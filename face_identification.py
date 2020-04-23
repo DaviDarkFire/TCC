@@ -74,22 +74,23 @@ def recog_faces(path,bb_flag):
 def recog_faces_in_video(video_path, bb_flag):
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
     video = cv2.VideoCapture(video_path)
-    #rotation = misc.check_rotation(video_path)
+    rotation = misc.get_video_rotation(video_path)
 
     fps = video.get(cv2.CAP_PROP_FPS)
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    output_video = cv2.VideoWriter('output.mp4', fourcc, fps, (width, height))
+    output_video = cv2.VideoWriter('output.mp4', fourcc, fps, (width,height))
     j = 0
     while True:
         ret, frame = video.read()
+
         if(not ret):
             break
-        #frame = misc.correct_rotation(frame,rotation)
-        j += 1
-        cv2.imwrite(f"exit/{j}_exit.jpg", frame)
+        
+        if(rotation != 0):
+            frame = cv2.rotate(frame,rotation)
 
         boxes = face_recognition.face_locations(frame,model="CNN")
         encodings = face_recognition.face_encodings(frame, boxes)
@@ -107,15 +108,18 @@ def recog_faces_in_video(video_path, bb_flag):
                 name = max(counts, key=counts.get)
             names += f"{name} "
             list_names.append(name)
-            
+
         for ((top, right, bottom, left), name) in zip(boxes, list_names):
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
             y = top - 15 if top - 15 > 15 else top + 15
             cv2.putText(frame, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
 
+        #cv2.imwrite(f"exit/{j}_exit.jpg", frame)
+        j += 1
+        print(f"Escrevendo {j} frame...")
         output_video.write(frame)
     video.release()
     output_video.release()
+    cv2.destroyAllWindows()
 
-#generate_encodings_from_facebank()
-recog_faces_in_video("video1.mp4",1)
+recog_faces_in_video("video_270.mp4",1)
