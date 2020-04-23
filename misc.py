@@ -20,11 +20,17 @@ def get_video_rotation(path):
     rotation = int(f.read())
     
     if (rotation == 270):
+        print("VIADOW1")
         rotation = cv2.ROTATE_90_COUNTERCLOCKWISE
     elif (rotation == 90):
+        print("VIADOW2")
         rotation = cv2.ROTATE_90_CLOCKWISE
     elif(rotation == 180):
+        print("VIADOW3")
         rotation = cv2.ROTATE_180
+    elif(rotation == 0):
+        print("VIADOW4")
+        rotation = -1
 
     f.close()
     return rotation

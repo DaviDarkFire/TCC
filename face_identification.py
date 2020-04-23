@@ -81,17 +81,22 @@ def recog_faces_in_video(video_path, bb_flag):
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    output_video = cv2.VideoWriter('output.mp4', fourcc, fps, (width,height))
+    if(rotation == cv2.ROTATE_90_COUNTERCLOCKWISE or rotation == cv2.ROTATE_90_CLOCKWISE):
+        output_video = cv2.VideoWriter('output.mp4', fourcc, fps, (height,width))
+    else:
+        output_video = cv2.VideoWriter('output.mp4', fourcc, fps, (width,height))
+
     j = 0
     while True:
         ret, frame = video.read()
 
         if(not ret):
             break
-        
-        if(rotation != 0):
-            frame = cv2.rotate(frame,rotation)
 
+        if(rotation != -1):
+            print(f"rotation: {rotation}")
+            frame = cv2.rotate(frame,rotation)
+    
         boxes = face_recognition.face_locations(frame,model="CNN")
         encodings = face_recognition.face_encodings(frame, boxes)
         names = ""
