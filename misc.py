@@ -1,5 +1,5 @@
 from PIL import Image
-import qtrotate as cu
+import os
 
 def generate_id(name):
     id = "_"
@@ -12,4 +12,12 @@ def update_facebank_with_unique_id():
         if folder_name[0] != '_':
             os.rename(f"{FACEBANK}/{folder_name}",f"{FACEBANK}/{generate_id(folder_name)}")
 
-print(cu.get_set_rotation("video2.mp4"))
+def get_video_rotation(path):
+    exit_file = "exit.txt"
+    os.system(f'"exiftool.exe" -s -S -Rotation {path} > {exit_file}')
+    f = open(exit_file,"r")
+    rotation = int(f.read())
+    f.close()
+    return rotation
+
+print(get_video_rotation("video____.mp4"))

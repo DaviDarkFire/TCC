@@ -107,12 +107,11 @@ def recog_faces_in_video(video_path, bb_flag):
                 name = max(counts, key=counts.get)
             names += f"{name} "
             list_names.append(name)
+            
         for ((top, right, bottom, left), name) in zip(boxes, list_names):
-            print("PENES")
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
             y = top - 15 if top - 15 > 15 else top + 15
             cv2.putText(frame, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
-            # frame = cv2.cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         output_video.write(frame)
     video.release()
