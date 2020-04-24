@@ -5,6 +5,8 @@ import os
 import cv2
 import pickle
 import pathlib
+import math
+import time
 
 FACEBANK = "facebank"
 extensions = ['.jpg','.jpeg','.JPG','.JPEG','.PNG','.BMP']
@@ -42,6 +44,21 @@ def save_img_with_bb(boxes, names, path):
     caminho = pathlib.Path().absolute()
     cv2.imwrite(f"{caminho}/exit/{nome}_exit{ext}", image)
 
+def get_formated_timestamp(milliseconds):
+    tempo = milliseconds/1000
+    if(tempo > 60):
+        tempo = tempo/60.0
+        if (tempo > 60):
+            tempo = tempo/60.0
+            minutos, horas = math.modf(tempo)
+            minutos *= 60
+            segundos, minutos = math.modf(minutos)
+            return f"{int(horas):02d}:{int(minutos):02d}:{int(segundos*60):02d}"
+        segundos, minutos = math.modf(tempo)
+        segundos *= 60 
+        return f"{int(minutos):02d}:{int(segundos):02d}"
+    return f"{int(tempo):02d} segundos"
+
 def recog_faces(path,bb_flag):
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
     f = open("predictions.txt","w")
@@ -75,12 +92,13 @@ def recog_faces_in_video(video_path, bb_flag):
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
     video = cv2.VideoCapture(video_path)
     rotation = misc.get_video_rotation(video_path)
+    f = open("predictions.txt","w")
 
     fps = video.get(cv2.CAP_PROP_FPS)
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
     if(rotation == cv2.ROTATE_90_COUNTERCLOCKWISE or rotation == cv2.ROTATE_90_CLOCKWISE):
         output_video = cv2.VideoWriter('output.mp4', fourcc, fps, (height,width))
     else:
@@ -111,20 +129,21 @@ def recog_faces_in_video(video_path, bb_flag):
                     name = data["names"][i]
                     counts[name] = counts.get(name, 0) + 1
                 name = max(counts, key=counts.get)
-            names += f"{name} "
+            f.write(f"{name} em {get_formated_timestamp(video.get(cv2.CAP_PROP_POS_MSEC))}\n")
             list_names.append(name)
 
         for ((top, right, bottom, left), name) in zip(boxes, list_names):
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
             y = top - 15 if top - 15 > 15 else top + 15
             cv2.putText(frame, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
-
-        #cv2.imwrite(f"exit/{j}_exit.jpg", frame)
         j += 1
-        print(f"Escrevendo {j} frame...")
+        print(f"Escrevendo {j} frame, {video.get(cv2.CAP_PROP_POS_MSEC)} ms")
         output_video.write(frame)
     video.release()
     output_video.release()
     cv2.destroyAllWindows()
+    f.close()
 
-recog_faces_in_video("video_270.mp4",1)
+ini = time.time()
+recog_faces_in_video("video_90.mp4",1)
+print(time.time()-ini)

@@ -18,6 +18,8 @@ def get_video_rotation(path):
     os.system(f'"exiftool.exe" -s -S -Rotation {path} > {exit_file}')
     f = open(exit_file,"r")
     rotation = int(f.read())
+    f.close()
+    os.remove("exit.txt")
     
     if (rotation == 270):
         print("VIADOW1")
@@ -32,5 +34,4 @@ def get_video_rotation(path):
         print("VIADOW4")
         rotation = -1
 
-    f.close()
     return rotation

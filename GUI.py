@@ -45,10 +45,10 @@ window.title("Face Identification")  # to define the title
 canvas = tk.Canvas(window, width=600, height=400)  # define the size
 canvas.pack()
 
-frame = tk.Frame(window, bg='#ecf0f1')
+frame = tk.Frame(window)
 frame.place(relx=0.05, rely=0.05,relwidth=0.45, relheight=0.9)
 
-frame2 = tk.Frame(window, bg='#ecf0f1')
+frame2 = tk.Frame(window)
 frame2.place(relx=0.5, rely=0.05,relwidth=0.45, relheight=0.9)
 
 frame3 = tk.Frame(frame, highlightbackground="black", highlightthickness=1)
@@ -59,7 +59,7 @@ frame4.place(relx=-0.04, rely=0.66,relwidth=1, relheight=0.1)
 
 w = tk.Canvas(frame3, width=600, height=600)
 w.pack()
-label = tk.Label(frame,text='Mídia\Diretório', bd='3', fg='blue', font='Helvetica 9 bold', bg='#ECF0F1')  # placing labels
+label = tk.Label(frame,text='Mídia\Diretório', bd='3', fg='blue', font='Helvetica 9 bold')  # placing labels
 label.place(relx=0.0, rely=0.0, relwidth=0.5, relheight=0.05)
 ##################################################Criação de widgets
 bt_open = tk.Button(frame2, text ="Abrir", command = abrir)
@@ -74,4 +74,5 @@ bt_train.place(relx=0.25, rely=0.49, relwidth=0.5, relheight=0.1)
 boundingbox_flag = tk.IntVar()
 c = tk.Checkbutton(frame4,text="Bounding Boxes", variable=boundingbox_flag)
 c.pack()
+
 window.mainloop()
