@@ -15,7 +15,8 @@ def update_facebank_with_unique_id():
 
 def get_video_rotation(path):
     exit_file = "exit.txt"
-    os.system(f'"exiftool.exe" -s -S -Rotation {path} > {exit_file}')
+    print(f"CATIAU CARAI: {os.path.relpath(path, os.getcwd())}")
+    os.system(f'"exiftool.exe" -s -S -Rotation {os.path.relpath(path, os.getcwd())} > {exit_file}')
     f = open(exit_file,"r")
     rotation = int(f.read())
     f.close()

@@ -94,15 +94,15 @@ def recog_faces_in_video(video_path, bb_flag):
     rotation = misc.get_video_rotation(video_path)
     f = open("predictions.txt","w")
 
-    fps = video.get(cv2.CAP_PROP_FPS)
-    width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-    if(rotation == cv2.ROTATE_90_COUNTERCLOCKWISE or rotation == cv2.ROTATE_90_CLOCKWISE):
-        output_video = cv2.VideoWriter('output.mp4', fourcc, fps, (height,width))
-    else:
-        output_video = cv2.VideoWriter('output.mp4', fourcc, fps, (width,height))
+    if(bb_flag):
+        fps = video.get(cv2.CAP_PROP_FPS)
+        width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+        if(rotation == cv2.ROTATE_90_COUNTERCLOCKWISE or rotation == cv2.ROTATE_90_CLOCKWISE):
+            output_video = cv2.VideoWriter('output.mp4', fourcc, fps, (height,width))
+        else:
+            output_video = cv2.VideoWriter('output.mp4', fourcc, fps, (width,height))
 
     j = 0
     while True:
@@ -112,7 +112,6 @@ def recog_faces_in_video(video_path, bb_flag):
             break
 
         if(rotation != -1):
-            print(f"rotation: {rotation}")
             frame = cv2.rotate(frame,rotation)
     
         boxes = face_recognition.face_locations(frame,model="CNN")
@@ -138,12 +137,10 @@ def recog_faces_in_video(video_path, bb_flag):
             cv2.putText(frame, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
         j += 1
         print(f"Escrevendo {j} frame, {video.get(cv2.CAP_PROP_POS_MSEC)} ms")
-        output_video.write(frame)
+        if(bb_flag):
+            output_video.write(frame)
     video.release()
-    output_video.release()
+    if(bb_flag):
+        output_video.release()
     cv2.destroyAllWindows()
     f.close()
-
-ini = time.time()
-recog_faces_in_video("video_90.mp4",1)
-print(time.time()-ini)

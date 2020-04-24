@@ -4,10 +4,13 @@ from tkinter import filedialog
 import os
 
 PATH = " "
-
+video_extensions = ['.mp4', '.m4a', '.m4v', '.f4v', '.f4a', '.m4b', '.m4r', '.f4b', '.mov','.wmv', '.wma', '.webm', '.flv','.avi','.mkv','.vob']
 def identify():
     if(PATH != " "):
         face_id.recog_faces(PATH,boundingbox_flag.get())
+        for file in os.listdir(PATH):
+            if(os.path.splitext(file)[1] in video_extensions):
+                face_id.recog_faces_in_video(f"{PATH}/{file}",boundingbox_flag.get())
         f = open("predictions.txt","r") 
         buff = f.read()
         show_text(buff)
