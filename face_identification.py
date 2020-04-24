@@ -61,7 +61,7 @@ def get_formated_timestamp(milliseconds):
 
 def recog_faces(path,bb_flag):
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
-    f = open("predictions.txt","w")
+    f = open("exit/img_predictions.txt","w")
     for subdir, dirs, images in os.walk(path):
         for img in  images:
             if(os.path.splitext(img)[1] in extensions):
@@ -92,7 +92,8 @@ def recog_faces_in_video(video_path, bb_flag):
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
     video = cv2.VideoCapture(video_path)
     rotation = misc.get_video_rotation(video_path)
-    f = open("predictions.txt","w")
+    video_name = video_path.split('/')[-1]
+    f = open(f"exit/predictions_{video_name}.txt","w")
 
     if(bb_flag):
         fps = video.get(cv2.CAP_PROP_FPS)
@@ -100,9 +101,9 @@ def recog_faces_in_video(video_path, bb_flag):
         height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
         if(rotation == cv2.ROTATE_90_COUNTERCLOCKWISE or rotation == cv2.ROTATE_90_CLOCKWISE):
-            output_video = cv2.VideoWriter('output.mp4', fourcc, fps, (height,width))
+            output_video = cv2.VideoWriter(f"exit/predictions_{video_name}.mp4", fourcc, fps, (height,width))
         else:
-            output_video = cv2.VideoWriter('output.mp4', fourcc, fps, (width,height))
+            output_video = cv2.VideoWriter(f"exit/predictions_{video_name}.mp4", fourcc, fps, (width,height))
 
     j = 0
     while True:

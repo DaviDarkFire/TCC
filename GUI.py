@@ -11,9 +11,9 @@ def identify():
         for file in os.listdir(PATH):
             if(os.path.splitext(file)[1] in video_extensions):
                 face_id.recog_faces_in_video(f"{PATH}/{file}",boundingbox_flag.get())
-        f = open("predictions.txt","r") 
+        f = open("exit/img_predictions.txt","r") 
         buff = f.read()
-        show_text(buff)
+        show_text(f"Video: video_predictions.txt\n{buff}")
     else:
         show_text("Selecione algum diretório.")
 
