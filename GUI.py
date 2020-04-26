@@ -2,6 +2,22 @@ import tkinter as tk
 import face_identification as face_id
 from tkinter import filedialog
 import os
+import threading
+
+class BaseThread(threading.Thread):
+    def __init__(self, callback=None, callback_args=None, *args, **kwargs):
+        target = kwargs.pop('target')
+        super(BaseThread, self).__init__(target=self.target_with_callback, *args, **kwargs)
+        self.callback = callback
+        self.method = target
+        self.callback_args = callback_args
+
+    def target_with_callback(self):
+        self.method()
+        if self.callback is not None:
+            self.callback(self.callback_args)
+
+
 class GUI():
     def __init__(self):
         self.path = " "
@@ -35,31 +51,48 @@ class GUI():
         self.c.pack()
         self.window.mainloop()
 
+    def indentify_video(self):
+        for file in os.listdir(self.path):
+            if(os.path.splitext(file)[1] in self.video_extensions):
+                face_id.recog_faces_in_video(f"{self.path}/{file}",self.boundingbox_flag.get())
+
     def identify(self):
         if(self.path != " "):
-            face_id.recog_faces(self.path,self.boundingbox_flag.get())
-            for file in os.listdir(self.path):
-                if(os.path.splitext(file)[1] in self.video_extensions):
-                    face_id.recog_faces_in_video(f"{self.path}/{file}",self.boundingbox_flag.get())
-            f = open("exit/img_predictions.txt","r") 
-            buff = f.read()
-            self.show_text(f"Video: video_predictions.txt\n{buff}")
+            thread = BaseThread(
+                name='Img Ident',
+                target=face_id.recog_faces,
+                args=(self.path, self.boundingbox_flag.get()),
+                callback=self.show_text,
+                callback_args=("exit/img_predictions.txt")
+            )
+            thread.start()
+            #face_id.recog_faces(self.path,self.boundingbox_flag.get())
+            #self.show_text(f"Video: video_predictions.txt\n{buff}")
         else:
             self.show_text("Selecione algum diretório.")
 
     def abrir(self):
-        self.path 
         self.path = filedialog.askdirectory(parent=self.frame_esq,title='Escolha uma pasta com fotos e/ou vídeos')
         self.show_files(self.path)
 
     def show_text(self,buffer):
+        if(os.path.isfile(buffer)):
+            f = open(buffer,"r") 
+            buffer = f.read()
         self.canvas_show.delete("all")
         self.canvas_show.create_text(20, 20, anchor='nw' , text=buffer)
 
     def update_facebank(self):
         self.show_text("Atualizando encodings...")
-        face_id.generate_encodings_from_facebank()
-        self.show_text("Encodings salvos em: \n face_encodings\encodings")
+        thread = BaseThread(
+                name='UpdateFacebank',
+                target=face_id.generate_encodings_from_facebank,
+                callback=self.show_text,
+                callback_args=("Encodings salvos em: \n face_encodings\encodings")
+        )
+        thread.start()
+        #face_id.generate_encodings_from_facebank()
+        #self.show_text("Encodings salvos em: \n face_encodings\encodings")
 
     def show_files(self,path):
         self.canvas_show.delete("all")
