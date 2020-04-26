@@ -15,7 +15,7 @@ class BaseThread(threading.Thread):
     def target_with_callback(self):
         self.method()
         if self.callback is not None:
-            self.callback(self.callback_args)
+            self.callback(*self.callback_args)
 
 
 class GUI():
@@ -63,19 +63,19 @@ class GUI():
                 target=face_id.recog_faces,
                 args=(self.path, self.boundingbox_flag.get()),
                 callback=self.show_text,
-                callback_args=("exit/img_predictions.txt")
+                callback_args=("exit/img_predictions.txt","pinto"),
             )
             thread.start()
             #face_id.recog_faces(self.path,self.boundingbox_flag.get())
             #self.show_text(f"Video: video_predictions.txt\n{buff}")
         else:
-            self.show_text("Selecione algum diretório.")
+            self.show_text("Selecione algum diretório.","pinto")
 
     def abrir(self):
         self.path = filedialog.askdirectory(parent=self.frame_esq,title='Escolha uma pasta com fotos e/ou vídeos')
         self.show_files(self.path)
 
-    def show_text(self,buffer):
+    def show_text(self,buffer,pinto):
         if(os.path.isfile(buffer)):
             f = open(buffer,"r") 
             buffer = f.read()
@@ -83,12 +83,12 @@ class GUI():
         self.canvas_show.create_text(20, 20, anchor='nw' , text=buffer)
 
     def update_facebank(self):
-        self.show_text("Atualizando encodings...")
+        self.show_text("Atualizando encodings...","pinto")
         thread = BaseThread(
                 name='UpdateFacebank',
                 target=face_id.generate_encodings_from_facebank,
                 callback=self.show_text,
-                callback_args=("Encodings salvos em: \n face_encodings\encodings")
+                callback_args=("Encodings salvos em: \n face_encodings\encodings","pinto")
         )
         thread.start()
         #face_id.generate_encodings_from_facebank()
