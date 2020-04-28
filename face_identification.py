@@ -11,7 +11,8 @@ import time
 FACEBANK = "facebank"
 extensions = ['.jpg','.jpeg','.JPG','.JPEG','.PNG','.BMP']
 
-def generate_encodings_from_facebank():
+def generate_encodings_from_facebank(show_text):
+    show_text("Atualizando banco de faces...\n Espere o término antes\n de fazer qualquer coisa.")
     knownEncodings = []
     knownNames = []
     for subdir, dirs, images in os.walk(FACEBANK):
@@ -31,6 +32,8 @@ def generate_encodings_from_facebank():
     f = open("face_encodings\encodings", "wb")
     f.write(pickle.dumps(data))
     f.close()
+    show_text("Banco de faces atualizado \n com sucesso!!!")
+    return
 
 def save_img_with_bb(boxes, names, path):
     image = cv2.imread(path)
@@ -59,9 +62,11 @@ def get_formated_timestamp(milliseconds):
         return f"{int(minutos):02d}:{int(segundos):02d}"
     return f"{int(tempo):02d} segundos"
 
-def recog_faces(path,bb_flag):
+def recog_faces(path,bb_flag, show_text):
+    show_text("Identificando imagens...")
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
     f = open("exit/img_predictions.txt","w")
+    buff = "Saídas em exit/img_predictions.txt \n"
     for subdir, dirs, images in os.walk(path):
         for img in  images:
             if(os.path.splitext(img)[1] in extensions):
@@ -84,9 +89,12 @@ def recog_faces(path,bb_flag):
                     names += f"{name} "
                     list_names.append(name)
                 f.write(f"{img}: {names}\n")
-                if(bb_flag):
+                buff += f"{img}: {names}\n"
+                if(bb_flag.get()):
                     save_img_with_bb(boxes,list_names,f"{subdir}/{img}")
     f.close()
+    show_text(buff)
+    return
 
 def recog_faces_in_video(video_path, bb_flag):
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
@@ -95,7 +103,7 @@ def recog_faces_in_video(video_path, bb_flag):
     video_name = video_path.split('/')[-1]
     f = open(f"exit/predictions_{video_name}.txt","w")
 
-    if(bb_flag):
+    if(bb_flag.get()):
         fps = video.get(cv2.CAP_PROP_FPS)
         width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -138,10 +146,11 @@ def recog_faces_in_video(video_path, bb_flag):
             cv2.putText(frame, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
         j += 1
         print(f"Escrevendo {j} frame, {video.get(cv2.CAP_PROP_POS_MSEC)} ms")
-        if(bb_flag):
+        if(bb_flag.get()):
             output_video.write(frame)
     video.release()
-    if(bb_flag):
+    if(bb_flag.get()):
         output_video.release()
     cv2.destroyAllWindows()
     f.close()
+    return
