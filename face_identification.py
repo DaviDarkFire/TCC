@@ -62,7 +62,7 @@ def get_formated_timestamp(milliseconds):
         return f"{int(minutos):02d}:{int(segundos):02d}"
     return f"{int(tempo):02d} segundos"
 
-def recog_faces(path,bb_flag, show_text):
+def recog_faces(path,bb_flag, show_text, img_window):
     show_text("Identificando imagens...")
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
     f = open("exit/img_predictions.txt","w")
@@ -90,28 +90,29 @@ def recog_faces(path,bb_flag, show_text):
                     list_names.append(name)
                 f.write(f"{img}: {names}\n")
                 buff += f"{img}: {names}\n"
-                if(bb_flag.get()):
+                if(bb_flag):
                     save_img_with_bb(boxes,list_names,f"{subdir}/{img}")
     f.close()
     show_text(buff)
+    img_window()
     return
 
-def recog_faces_in_video(video_path, bb_flag):
+def recog_faces_in_video(video_path, bb_flag, show_text):
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
     video = cv2.VideoCapture(video_path)
     rotation = misc.get_video_rotation(video_path)
     video_name = video_path.split('/')[-1]
     f = open(f"exit/predictions_{video_name}.txt","w")
 
-    if(bb_flag.get()):
+    if(bb_flag):
         fps = video.get(cv2.CAP_PROP_FPS)
         width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
         if(rotation == cv2.ROTATE_90_COUNTERCLOCKWISE or rotation == cv2.ROTATE_90_CLOCKWISE):
-            output_video = cv2.VideoWriter(f"exit/predictions_{video_name}.mp4", fourcc, fps, (height,width))
+            output_video = cv2.VideoWriter(f"exit/predictions_{video_name}", fourcc, fps, (height,width))
         else:
-            output_video = cv2.VideoWriter(f"exit/predictions_{video_name}.mp4", fourcc, fps, (width,height))
+            output_video = cv2.VideoWriter(f"exit/predictions_{video_name}", fourcc, fps, (width,height))
 
     j = 0
     while True:
@@ -146,11 +147,12 @@ def recog_faces_in_video(video_path, bb_flag):
             cv2.putText(frame, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
         j += 1
         print(f"Escrevendo {j} frame, {video.get(cv2.CAP_PROP_POS_MSEC)} ms")
-        if(bb_flag.get()):
+        if(bb_flag):
             output_video.write(frame)
     video.release()
-    if(bb_flag.get()):
+    if(bb_flag):
         output_video.release()
     cv2.destroyAllWindows()
     f.close()
+    show_text(f"exit/predictions_{video_name}\n", mode=0)
     return

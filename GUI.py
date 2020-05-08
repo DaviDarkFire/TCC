@@ -6,6 +6,7 @@ import threading
 
 class GUI():
     def __init__(self):
+        self.show_text_height = 0
         self.path = " "
         self.video_extensions = ['.mp4', '.m4a', '.m4v', '.f4v', '.f4a', '.m4b', '.m4r', '.f4b', '.mov','.wmv', '.wma', '.webm', '.flv','.avi','.mkv','.vob']
         ###################################################Criação base da janela
@@ -37,15 +38,23 @@ class GUI():
         self.c.pack()
         self.window.mainloop()
 
+    def create_view_images_window(self):
+        img_window = tk.Tk()
+        img_window.title("Imagens Geradas")
+        img_canvas = tk.Canvas(img_window, width=600, height=400)
+        img_canvas.pack()
+        img_window.mainloop()
+        
+
     def identify_video(self):
         for file in os.listdir(self.path):
             if(os.path.splitext(file)[1] in self.video_extensions):
-                face_id.recog_faces_in_video(f"{self.path}/{file}",self.boundingbox_flag.get())
+                face_id.recog_faces_in_video(f"{self.path}/{file}",self.boundingbox_flag.get(),self.show_text)
         return
 
     def identify(self):
         if(self.path != " "):
-            t_img = threading.Thread(target=face_id.recog_faces, args=(self.path, self.boundingbox_flag,self.show_text,))
+            t_img = threading.Thread(target=face_id.recog_faces, args=(self.path, self.boundingbox_flag.get(),self.show_text,self.create_view_images_window,))
             t_img.start()
             t_video = threading.Thread(target=self.identify_video)
             t_video.start()
@@ -56,16 +65,19 @@ class GUI():
         self.path = filedialog.askdirectory(parent=self.frame_esq,title='Escolha uma pasta com fotos e/ou vídeos')
         self.show_files(self.path)
 
-    def show_text(self,buffer, mode=1): #mode 1 => delete all text and write new one, mode 0 => apend text
-        width_margin = 20
-        height_margin = 70
+    def show_text(self,buffer, mode=1): #mode 1 => delete all text and write a new one, mode 0 => apend text
         if(os.path.isfile(buffer)):
             f = open(buffer,"r") 
             buffer = f.read()
         if(mode):
             self.canvas_show.delete("all")
-            height_margin = 20
-        self.canvas_show.create_text(width_margin, height_margin, anchor='nw' , text=buffer)
+            myText = self.canvas_show.create_text(20, 20, anchor='nw' , text=buffer)
+            bounds = self.canvas_show.bbox(myText)
+            self.show_text_height = bounds[3] - bounds[1]
+        else:
+            myText = self.canvas_show.create_text(20, self.show_text_height+10, anchor='nw' , text=buffer)
+            bounds = self.canvas_show.bbox(myText)
+            self.show_text_height += bounds[3] - bounds[1]
         return
 
     def update_facebank(self):
