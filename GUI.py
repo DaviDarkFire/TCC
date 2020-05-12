@@ -3,6 +3,8 @@ import face_identification as face_id
 from tkinter import filedialog
 import os
 import threading
+from PIL import ImageTk, Image
+
 
 class GUI():
     def __init__(self):
@@ -43,6 +45,9 @@ class GUI():
         img_window.title("Imagens Geradas")
         img_canvas = tk.Canvas(img_window, width=600, height=400)
         img_canvas.pack()
+        img = Image.open("exit/teste_exit.jpg")
+        photo_img = tk.PhotoImage(img)
+        img_canvas.create_image(50, 10, image=photo_img, anchor='nw')
         img_window.mainloop()
         
 
@@ -96,4 +101,13 @@ class GUI():
             i += 20
         self.canvas_show.create_text(20, 20, anchor='nw' , text=strings) #n, ne, e, se, s, sw, self.canvas_show, nw
     
-interface = GUI()
+#interface = GUI()
+
+img_window = tk.Tk()
+img_window.title("Imagens Geradas")
+img_canvas = tk.Canvas(img_window, width=600, height=400)
+img_canvas.pack()
+img = Image.open("exit/teste_exit.jpg")
+img = ImageTk.PhotoImage(img)
+img_canvas.create_image(50, 10, image=img, anchor='nw')
+img_window.mainloop()
