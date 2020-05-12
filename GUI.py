@@ -90,4 +90,5 @@ class GUI():
             i += 20
         self.canvas_show.create_text(20, 20, anchor='nw' , text=strings) #n, ne, e, se, s, sw, self.canvas_show, nw
     
-interface = GUI()
+if __name__ == '__main__':
+    interface = GUI()
