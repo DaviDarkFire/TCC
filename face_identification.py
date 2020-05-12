@@ -1,6 +1,5 @@
 #code based on https://www.pyimagesearch.com/2018/06/18/face-recognition-with-opencv-python-and-deep-learning/
 import face_recognition
-import misc
 import os
 import sys
 import subprocess
@@ -9,12 +8,30 @@ import pickle
 import pathlib
 import math
 import time
-#import img_viewer
 
 FACEBANK = "facebank"
 extensions = ['.jpg','.jpeg','.JPG','.JPEG','.PNG','.BMP']
 
-def generate_encodings_from_facebank(show_text):
+def get_video_rotation(path):
+    exit_file = "exit.txt"
+    os.system(f'"exiftool.exe" -s -S -Rotation {os.path.relpath(path, os.getcwd())} > {exit_file}')
+    f = open(exit_file,"r")
+    rotation = int(f.read())
+    f.close()
+    os.remove("exit.txt")
+    
+    if (rotation == 270):
+        rotation = cv2.ROTATE_90_COUNTERCLOCKWISE
+    elif (rotation == 90):
+        rotation = cv2.ROTATE_90_CLOCKWISE
+    elif(rotation == 180):
+        rotation = cv2.ROTATE_180
+    elif(rotation == 0):
+        rotation = -1
+
+    return rotation
+
+def generate_encodings_from_facebank(show_text): #adicionar verificação do banco de dados
     show_text("Atualizando banco de faces...\n Espere o término antes\n de fazer qualquer coisa.")
     knownEncodings = []
     knownNames = []
@@ -65,7 +82,7 @@ def get_formated_timestamp(milliseconds):
         return f"{int(minutos):02d}:{int(segundos):02d}"
     return f"{int(tempo):02d} segundos"
 
-def recog_faces(path,bb_flag, show_text):
+def recog_faces(path,bb_flag, show_text): #adicionar verificação pra ver se tem encodings
     show_text("Identificando imagens...")
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
     f = open("exit/img_predictions.txt","w")
@@ -101,10 +118,10 @@ def recog_faces(path,bb_flag, show_text):
     subprocess.run([imageViewerFromCommandLine, f"{pathlib.Path().absolute()}\exit\\"])
     return
 
-def recog_faces_in_video(video_path, bb_flag, show_text):
+def recog_faces_in_video(video_path, bb_flag, show_text): #adicionar verificação pra ver se tem encodings
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
     video = cv2.VideoCapture(video_path)
-    rotation = misc.get_video_rotation(video_path)
+    rotation = get_video_rotation(video_path)
     video_name = video_path.split('/')[-1]
     f = open(f"exit/predictions_{video_name}.txt","w")
 

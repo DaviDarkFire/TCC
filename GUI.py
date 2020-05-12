@@ -3,8 +3,6 @@ import face_identification as face_id
 from tkinter import filedialog
 import os
 import threading
-from PIL import ImageTk, Image
-
 
 class GUI():
     def __init__(self):
