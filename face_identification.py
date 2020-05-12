@@ -2,11 +2,14 @@
 import face_recognition
 import misc
 import os
+import sys
+import subprocess
 import cv2
 import pickle
 import pathlib
 import math
 import time
+#import img_viewer
 
 FACEBANK = "facebank"
 extensions = ['.jpg','.jpeg','.JPG','.JPEG','.PNG','.BMP']
@@ -62,7 +65,7 @@ def get_formated_timestamp(milliseconds):
         return f"{int(minutos):02d}:{int(segundos):02d}"
     return f"{int(tempo):02d} segundos"
 
-def recog_faces(path,bb_flag, show_text, img_window):
+def recog_faces(path,bb_flag, show_text):
     show_text("Identificando imagens...")
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
     f = open("exit/img_predictions.txt","w")
@@ -94,7 +97,8 @@ def recog_faces(path,bb_flag, show_text, img_window):
                     save_img_with_bb(boxes,list_names,f"{subdir}/{img}")
     f.close()
     show_text(buff)
-    img_window()
+    imageViewerFromCommandLine = {'linux':'xdg-open','win32':'explorer','darwin':'open'}[sys.platform]
+    subprocess.run([imageViewerFromCommandLine, f"{pathlib.Path().absolute()}\exit\\"])
     return
 
 def recog_faces_in_video(video_path, bb_flag, show_text):
