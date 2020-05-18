@@ -9,7 +9,7 @@ import pathlib
 import math
 import time
 
-FACEBANK = "facebank"
+facebank = ""
 extensions = ['.jpg','.jpeg','.JPG','.JPEG','.PNG','.BMP']
 
 def get_video_rotation(path):
@@ -35,24 +35,25 @@ def generate_encodings_from_facebank(show_text): #adicionar verificação do ban
     show_text("Atualizando banco de faces...\n Espere o término antes\n de fazer qualquer coisa.")
     knownEncodings = []
     knownNames = []
-    for subdir, dirs, images in os.walk(FACEBANK):
+    for subdir, dirs, images in os.walk(facebank):
+        show_text(subdir)
         for image in  images:
-            print(f"Encoding: {image}")
-            print(subdir)
-            name = subdir.split('\\')[1]
-            imagePath = f"{subdir}\{image}"
-            image = cv2.imread(imagePath)
-            rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            boxes = face_recognition.face_locations(rgb,model='CNN')
-            encodings = face_recognition.face_encodings(rgb, boxes)
-            for encoding in encodings:
-                knownEncodings.append(encoding)
-                knownNames.append(name)
+            if(os.path.splitext(image)[1] in extensions):
+                show_text(f"Adicionando: {image}", mode=0)
+                name = subdir.split('\\')[1]
+                imagePath = f"{subdir}\{image}"
+                image = cv2.imread(imagePath)
+                rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                boxes = face_recognition.face_locations(rgb,model='CNN')
+                encodings = face_recognition.face_encodings(rgb, boxes)
+                for encoding in encodings:
+                    knownEncodings.append(encoding)
+                    knownNames.append(name)
     data = {"encodings": knownEncodings, "names": knownNames}
     f = open("face_encodings\encodings", "wb")
     f.write(pickle.dumps(data))
     f.close()
-    show_text("Banco de faces atualizado \n com sucesso!!!")
+    show_text("texts/text3.txt")
     return
 
 def save_img_with_bb(boxes, names, path):

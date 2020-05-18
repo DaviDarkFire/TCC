@@ -1,0 +1,3 @@
+2 - Muito bem, agora clique em "2º Atualizar Banco" e espere
+ate o termino da operacao de atualizacao do Banco de Faces.
+

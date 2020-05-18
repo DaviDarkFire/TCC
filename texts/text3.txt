@@ -1,0 +1,9 @@
+3 - Banco de Faces atualizado com sucesso!!!
+Agora voce ja pode identificar em imagens ou videos as pessoas que
+foram cadastradas no Banco de Faces. Para isso clique em 
+                "3º Abrir Faces Desconhecidas" 
+e selecione uma PASTA, que possua as imagens e/ou vídeos desejados.
+
+Vale ressaltar que para videos o algoritmo pode demorar bastante, 
+assim sendo recomendamos que os videos tenham poucos SEGUNDOS para que
+a espera não seja grande.

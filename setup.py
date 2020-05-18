@@ -2,7 +2,7 @@ import sys
 from cx_Freeze import setup, Executable
 
 # Dependencies are automatically detected, but it might need fine tuning.
-build_exe_options = {"packages": ["os","pkg_resources.py2_warn"], "include_files": ["exit/","face_encodings/","facebank","unknown_faces","exiftool.exe"]}
+build_exe_options = {"packages": ["os","pkg_resources.py2_warn"], "include_files": ["exit/","face_encodings/","facebank","unknown_faces","exiftool.exe","texts/"]}
 
 # GUI applications require a different base on Windows (the default is for a
 # console application).

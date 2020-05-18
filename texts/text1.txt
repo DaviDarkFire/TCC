@@ -1,0 +1,25 @@
+1 - Primeiro voce precisa de um banco de dados com as
+faces que quer identificar futuramente, para isso crie
+um diretorio com a seguinte estrutura em qualquer lugar que desejar:
+
+facebank/
+     nome_pessoa/
+               whatsapp_image.JPG
+               foto1.jpg
+    nome_outra_pessoa/
+               foto1.png
+               imagem.jpeg   
+    .
+    .
+    .
+    joao_da_silva/          
+                picture.JPEG
+
+Note que cada pasta deve conter apenas IMAGENS relativas a somente UMA pessoa.
+Tambem note que os nomes das pastas devem ser DIFERENTES, caso contrário pode haver 
+conflitos futuros, por isso pode ser util usar o CPF da pessoa como nome da pasta.
+Apos criar o diretorio clique no botao "Banco de Faces" e selecione a pasta raiz, 
+no caso deste exemplo a raiz e "facebank/".
+Se tudo der certo, a estrutura do diretorio aparecera nesta caixa assim 
+como no exemplo.
+NAO DEIXE imagens fora das pastas de cada pessoa.
