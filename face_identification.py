@@ -31,7 +31,7 @@ def get_video_rotation(path):
 
     return rotation
 
-def generate_encodings_from_facebank(show_text): #adicionar verificação do banco de dados
+def generate_encodings_from_facebank(show_text, put_image): #adicionar verificação do banco de dados
     show_text("Atualizando banco de faces...\n Espere o término antes\n de fazer qualquer coisa.")
     knownEncodings = []
     knownNames = []
@@ -54,6 +54,7 @@ def generate_encodings_from_facebank(show_text): #adicionar verificação do ban
     f.write(pickle.dumps(data))
     f.close()
     show_text("texts/text3.txt")
+    put_image(2)
     return
 
 def save_img_with_bb(boxes, names, path):

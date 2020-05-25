@@ -4,6 +4,7 @@ from tkinter import filedialog
 import os
 import threading
 import ctypes
+import time
 
 class GUI():
     def __init__(self):
@@ -41,8 +42,24 @@ class GUI():
         self.c = tk.Checkbutton(self.frame_checkbox,text="Bounding Boxes", variable=self.boundingbox_flag)
         self.c.select()
         self.c.pack()
-        self.show_text("texts/text1.txt", mode=1)
+        #self.show_text("texts/text1.txt", mode=1)
+        self.imgs = []
+        self.imgs.append(tk.PhotoImage(file="img/atualizar_facebank.png"))
+        self.imgs.append(tk.PhotoImage(file="img/atualizar1.png"))
+        self.imgs.append(tk.PhotoImage(file="img/abrir_desconhecido1.png"))
+        self.imgs.append(tk.PhotoImage(file="img/identificar.png"))
+        self.put_image(0)
         self.window.mainloop()
+
+    def put_image(self, i):
+        if(i == 0):
+            self.canvas_show.create_image(20, 20, image=self.imgs[i], anchor='nw')
+        elif(i == 1):
+            self.canvas_show.create_image(80, self.show_text_height, image=self.imgs[i], anchor='nw')
+        elif(i == 2):
+            self.canvas_show.create_image(20,self.show_text_height, image=self.imgs[i], anchor='nw')
+        elif(i == 3):
+            self.canvas_show.create_image(20, 20, image=self.imgs[i], anchor='nw')
 
     def identify_video(self):
         for file in os.listdir(self.path):
@@ -64,6 +81,7 @@ class GUI():
         print(self.path)
         if(os.path.isdir(self.path)):
             self.show_files(self.path)
+            self.show_text("texts/text4.txt",mode=0)
 
     def abrir_banco_faces(self):
         face_id.facebank = filedialog.askdirectory(parent=self.frame_esq,title='Escolha o diretório com faces criado por você:')
@@ -71,6 +89,7 @@ class GUI():
         if(os.path.isdir(face_id.facebank)):
             self.show_files(face_id.facebank)
             self.show_text("texts/text2.txt",mode=0)
+            self.put_image(1)
 
     def show_text(self,buffer, mode=1): #mode 1 => delete all text and write a new one, mode 0 => apend text
         if(os.path.isfile(buffer)):
@@ -81,15 +100,14 @@ class GUI():
             myText = self.canvas_show.create_text(20, 20, anchor='nw' , text=buffer)
             bounds = self.canvas_show.bbox(myText)
             self.show_text_height = bounds[3] - bounds[1] + 9 #CATAPIMBAS CONFRADE IS THAT GAMBITO REFERENCE?
-            print(f"{buffer}: {self.show_text_height}")
         else:
             myText = self.canvas_show.create_text(20, self.show_text_height+10, anchor='nw' , text=buffer)
             bounds = self.canvas_show.bbox(myText)
-            self.show_text_height += bounds[3] - bounds[1]
+            self.show_text_height += bounds[3] - bounds[1] + 9
         return
 
     def update_facebank(self):
-        t = threading.Thread(target=face_id.generate_encodings_from_facebank, args=(self.show_text,))
+        t = threading.Thread(target=face_id.generate_encodings_from_facebank, args=(self.show_text,self.put_image))
         t.start()
         # face_id.generate_encodings_from_facebank()
         # self.show_text("Encodings salvos em: \n face_encodings\encodings")
@@ -105,7 +123,9 @@ class GUI():
             else:
                 strings += f"          {file}\n"
             i += 20
-        self.canvas_show.create_text(20, 20, anchor='nw' , text=strings) #n, ne, e, se, s, sw, self.canvas_show, nw
+        myText = self.canvas_show.create_text(20, 20, anchor='nw' , text=strings) #n, ne, e, se, s, sw, self.canvas_show, nw
+        bounds = self.canvas_show.bbox(myText)
+        self.show_text_height = bounds[3] - bounds[1] + 9
     
 if __name__ == '__main__':
     interface = GUI()
