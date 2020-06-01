@@ -1,0 +1,6 @@
+da pasta que vc abriu com "3 Abrir Faces Desconhecidas" clique em: 
+                        "4 Identificar"
+
+Atente ao fato de que para videos o algoritmo pode demorar bastante, 
+assim sendo recomendamos que os videos tenham poucos SEGUNDOS para que
+a espera nao seja grande.

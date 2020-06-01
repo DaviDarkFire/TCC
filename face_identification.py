@@ -10,6 +10,7 @@ import math
 import time
 
 facebank = ""
+exit = ""
 extensions = ['.jpg','.jpeg','.JPG','.JPEG','.PNG','.BMP']
 
 def get_video_rotation(path):
@@ -35,26 +36,27 @@ def generate_encodings_from_facebank(show_text, put_image): #adicionar verifica�
     show_text("Atualizando banco de faces...\n Espere o término antes\n de fazer qualquer coisa.")
     knownEncodings = []
     knownNames = []
-    for subdir, dirs, images in os.walk(facebank):
-        show_text(subdir)
-        for image in  images:
-            if(os.path.splitext(image)[1] in extensions):
-                show_text(f"Adicionando: {image}", mode=0)
-                name = subdir.split('\\')[1]
-                imagePath = f"{subdir}\{image}"
-                image = cv2.imread(imagePath)
-                rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                boxes = face_recognition.face_locations(rgb,model='CNN')
-                encodings = face_recognition.face_encodings(rgb, boxes)
-                for encoding in encodings:
-                    knownEncodings.append(encoding)
-                    knownNames.append(name)
+    for folder in os.listdir(facebank):
+        show_text(f"{os.path.join(facebank,folder)}:")
+        if(os.path.isdir(os.path.join(facebank,folder))):
+            for image in os.listdir(os.path.join(facebank,folder)):
+                if(os.path.splitext(image)[1] in extensions):
+                    show_text(f"Adicionando: {image}", mode=0)
+                    name = folder
+                    imagePath = os.path.join(os.path.join(facebank,folder), image)
+                    image = cv2.imread(imagePath)
+                    rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                    boxes = face_recognition.face_locations(rgb,model='CNN')
+                    encodings = face_recognition.face_encodings(rgb, boxes)
+                    for encoding in encodings:
+                        knownEncodings.append(encoding)
+                        knownNames.append(name)
     data = {"encodings": knownEncodings, "names": knownNames}
     f = open("face_encodings\encodings", "wb")
     f.write(pickle.dumps(data))
     f.close()
     show_text("texts/text3.txt")
-    put_image(2)
+    put_image(1)
     return
 
 def save_img_with_bb(boxes, names, path):
@@ -64,10 +66,9 @@ def save_img_with_bb(boxes, names, path):
         y = top - 15 if top - 15 > 15 else top + 15
         cv2.putText(image, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
 
-    nome = os.path.splitext(path)[0].split('/')[-1] 
-    ext = os.path.splitext(path)[1]
-    caminho = pathlib.Path().absolute()
-    cv2.imwrite(f"{caminho}/exit/{nome}_exit{ext}", image)
+    nome =  os.path.basename(os.path.normpath(path))
+    saida = os.path.join(exit, nome)
+    cv2.imwrite(saida, image)
 
 def get_formated_timestamp(milliseconds):
     tempo = milliseconds/1000
@@ -87,8 +88,9 @@ def get_formated_timestamp(milliseconds):
 def recog_faces(path,bb_flag, show_text): #adicionar verificação pra ver se tem encodings
     show_text("Identificando imagens...")
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
-    f = open("exit/img_predictions.txt","w")
-    buff = "Saídas em exit/img_predictions.txt \n"
+    f = open(os.path.join(exit,"img_predictions.txt"),"w")
+    teste = os.path.join(exit,"img_predictions.txt")
+    buff = f"Saídas em {teste}\n"
     for subdir, dirs, images in os.walk(path):
         for img in  images:
             if(os.path.splitext(img)[1] in extensions):
@@ -113,11 +115,11 @@ def recog_faces(path,bb_flag, show_text): #adicionar verificação pra ver se te
                 f.write(f"{img}: {names}\n")
                 buff += f"{img}: {names}\n"
                 if(bb_flag):
-                    save_img_with_bb(boxes,list_names,f"{subdir}/{img}")
+                    save_img_with_bb(boxes,list_names,os.path.join(path,img))
     f.close()
     show_text(buff)
     imageViewerFromCommandLine = {'linux':'xdg-open','win32':'explorer','darwin':'open'}[sys.platform]
-    subprocess.run([imageViewerFromCommandLine, f"{pathlib.Path().absolute()}\exit\\"])
+    subprocess.run([imageViewerFromCommandLine, exit])
     return
 
 def recog_faces_in_video(video_path, bb_flag, show_text): #adicionar verificação pra ver se tem encodings

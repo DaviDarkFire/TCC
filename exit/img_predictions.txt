@@ -1,2 +1,0 @@
-pessoa1.jpg: 
-pessoa2.jpg: 
