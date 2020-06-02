@@ -15,19 +15,19 @@ class GUI():
         self.window = tk.Tk()
         self.window.title("Face Identification")
         user32 = ctypes.windll.user32
-        self.canvas = tk.Canvas(self.window, width=user32.GetSystemMetrics(0), height=user32.GetSystemMetrics(1)) #o canvas serve pra dar um tamanho
+        self.canvas = tk.Canvas(self.window, width=user32.GetSystemMetrics(0), height=user32.GetSystemMetrics(1), bg="#BFBFBF") #o canvas serve pra dar um tamanho
         self.canvas.pack()
-        self.frame_esq = tk.Frame(self.window)
+        self.frame_esq = tk.Frame(self.window, bg="#404040")
         self.frame_esq.place(relx=0.05, rely=0.05,relwidth=0.45, relheight=0.9)
-        self.frame_dir = tk.Frame(self.window)
+        self.frame_dir = tk.Frame(self.window, bg="#BFBFBF")
         self.frame_dir.place(relx=0.5, rely=0.05,relwidth=0.45, relheight=0.9)
         self.frame_show = tk.Frame(self.frame_esq, highlightbackground="black", highlightthickness=1)
         self.frame_show.place(relx=0.1, rely=0.1,relwidth=0.8, relheight=0.8)
-        self.frame_checkbox = tk.Frame(self.frame_dir)
+        self.frame_checkbox = tk.Frame(self.frame_dir, bg="#BFBFBF")
         self.frame_checkbox.place(relx=0.00, rely=0.66,relwidth=1, relheight=0.1)
         self.canvas_show = tk.Canvas(self.frame_show, width=600, height=600, bg="white")
         self.canvas_show.pack()
-        self.label = tk.Label(self.frame_esq,text='Mídia\Diretório', bd='3', fg='blue', font='Helvetica 9 bold')
+        self.label = tk.Label(self.frame_esq,text='Mídia\Diretório', bd='3', fg='#E6E6E6', font='Helvetica 9 bold', bg="#404040")
         self.label.place(relx=0.0, rely=0.0, relwidth=0.5, relheight=0.05)
         ##################################################Criação de widgets
         self.bt_train = tk.Button(self.frame_dir, text ="1º Atualizar Banco de Faces", command = self.update_facebank)

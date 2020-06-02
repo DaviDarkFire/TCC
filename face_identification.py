@@ -113,6 +113,7 @@ def recog_faces(path,bb_flag, show_text): #adicionar verifica√ß√£o pra ver se te
                     names += f"{name} "
                     list_names.append(name)
                 f.write(f"{img}: {names}\n")
+                show_text(f"{img}: {names}",mode=0)
                 buff += f"{img}: {names}\n"
                 if(bb_flag):
                     save_img_with_bb(boxes,list_names,os.path.join(path,img))
@@ -126,8 +127,9 @@ def recog_faces_in_video(video_path, bb_flag, show_text): #adicionar verifica√ß√
     data = pickle.loads(open("face_encodings/encodings", "rb").read())
     video = cv2.VideoCapture(video_path)
     rotation = get_video_rotation(video_path)
-    video_name = video_path.split('/')[-1]
-    f = open(f"exit/predictions_{video_name}.txt","w")
+    video_name =  os.path.splitext(os.path.basename(video_path))[0]
+    f = open(os.path.join(exit,f"{video_name}.txt"),"w")
+    print(os.path.join(exit,f"{video_name}"))
 
     if(bb_flag):
         fps = video.get(cv2.CAP_PROP_FPS)
@@ -135,9 +137,9 @@ def recog_faces_in_video(video_path, bb_flag, show_text): #adicionar verifica√ß√
         height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
         if(rotation == cv2.ROTATE_90_COUNTERCLOCKWISE or rotation == cv2.ROTATE_90_CLOCKWISE):
-            output_video = cv2.VideoWriter(f"exit/predictions_{video_name}", fourcc, fps, (height,width))
+            output_video = cv2.VideoWriter(os.path.join(exit,f"{video_name}.mp4"), fourcc, fps, (height,width))
         else:
-            output_video = cv2.VideoWriter(f"exit/predictions_{video_name}", fourcc, fps, (width,height))
+            output_video = cv2.VideoWriter(os.path.join(exit,f"{video_name}.mp4"), fourcc, fps, (width,height))
 
     j = 0
     while True:
@@ -179,5 +181,5 @@ def recog_faces_in_video(video_path, bb_flag, show_text): #adicionar verifica√ß√
         output_video.release()
     cv2.destroyAllWindows()
     f.close()
-    show_text(f"exit/predictions_{video_name}\n", mode=0)
+    show_text(os.path.join(exit,f"{video_name}.txt"), mode=0)
     return
