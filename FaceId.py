@@ -13,6 +13,7 @@ class GUI():
         self.video_extensions = ['.mp4', '.m4a', '.m4v', '.f4v', '.f4a', '.m4b', '.m4r', '.f4b', '.mov','.wmv', '.wma', '.webm', '.flv','.avi','.mkv','.vob']
         ###################################################Criação base da janela
         self.window = tk.Tk()
+        self.window.iconphoto(False, tk.PhotoImage(file='img/icon2.png'))
         self.window.title("Face Identification")
         user32 = ctypes.windll.user32
         self.canvas = tk.Canvas(self.window, width=user32.GetSystemMetrics(0), height=user32.GetSystemMetrics(1), bg="#BFBFBF") #o canvas serve pra dar um tamanho
@@ -61,6 +62,7 @@ class GUI():
     def identify_video(self):
         for file in os.listdir(self.path):
             if(os.path.splitext(file)[1] in self.video_extensions):
+                face_id.flag = 0
                 face_id.recog_faces_in_video(f"{self.path}/{file}",self.boundingbox_flag.get(),self.show_text)
         return
 

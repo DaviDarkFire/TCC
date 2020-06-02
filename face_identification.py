@@ -12,10 +12,15 @@ import time
 facebank = ""
 exit = ""
 extensions = ['.jpg','.jpeg','.JPG','.JPEG','.PNG','.BMP']
+flag = 1
 
 def get_video_rotation(path):
     exit_file = "exit.txt"
-    os.system(f'"exiftool.exe" -s -S -Rotation {os.path.relpath(path, os.getcwd())} > {exit_file}')
+    try:
+        os.system(f'"exiftool.exe" -s -S -Rotation {os.path.relpath(path, os.getcwd())} > {exit_file}')
+    except:
+        print("Baixe o exiftool.exe e coloque-o na pasta build com o nome 'exiftool.exe'!!!")
+        return
     f = open(exit_file,"r")
     rotation = int(f.read())
     f.close()
@@ -52,11 +57,14 @@ def generate_encodings_from_facebank(show_text, put_image): #adicionar verifica�
                         knownEncodings.append(encoding)
                         knownNames.append(name)
     data = {"encodings": knownEncodings, "names": knownNames}
-    f = open("face_encodings\encodings", "wb")
-    f.write(pickle.dumps(data))
-    f.close()
-    show_text("texts/text3.txt")
-    put_image(1)
+    try:
+        f = open("face_encodings\encodings", "wb")
+        f.write(pickle.dumps(data))
+        f.close()
+        show_text("texts/text3.txt")
+        put_image(1)
+    except:
+        show_text("Não foi possível atualizar o Banco de Faces!!!")
     return
 
 def save_img_with_bb(boxes, names, path):
@@ -86,15 +94,23 @@ def get_formated_timestamp(milliseconds):
     return f"{int(tempo):02d} segundos"
 
 def recog_faces(path,bb_flag, show_text): #adicionar verificação pra ver se tem encodings
-    show_text("Identificando imagens...")
-    data = pickle.loads(open("face_encodings/encodings", "rb").read())
+    try:
+        show_text("Identificando imagens...")
+        data = pickle.loads(open("face_encodings/encodings", "rb").read())
+    except:
+        show_text("Problema ao carregar Banco de Dados, experimente atualizar o banco corretamente!!!")
+        return
     f = open(os.path.join(exit,"img_predictions.txt"),"w")
     teste = os.path.join(exit,"img_predictions.txt")
     buff = f"Saídas em {teste}\n"
     for subdir, dirs, images in os.walk(path):
         for img in  images:
             if(os.path.splitext(img)[1] in extensions):
-                image = cv2.imread(f"{subdir}/{img}")
+                try:
+                    image = cv2.imread(os.path.join(subdir,img))
+                except:
+                    show_text(f"Problema ao carregar a imagem {img} !!!")
+                    break
                 rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 boxes = face_recognition.face_locations(rgb,model="CNN")
                 encodings = face_recognition.face_encodings(rgb, boxes)
@@ -119,17 +135,31 @@ def recog_faces(path,bb_flag, show_text): #adicionar verificação pra ver se te
                     save_img_with_bb(boxes,list_names,os.path.join(path,img))
     f.close()
     show_text(buff)
-    imageViewerFromCommandLine = {'linux':'xdg-open','win32':'explorer','darwin':'open'}[sys.platform]
-    subprocess.run([imageViewerFromCommandLine, exit])
+    if (flag):
+        imageViewerFromCommandLine = {'linux':'xdg-open','win32':'explorer','darwin':'open'}[sys.platform]
+        subprocess.run([imageViewerFromCommandLine, exit])
     return
 
 def recog_faces_in_video(video_path, bb_flag, show_text): #adicionar verificação pra ver se tem encodings
-    data = pickle.loads(open("face_encodings/encodings", "rb").read())
-    video = cv2.VideoCapture(video_path)
+    try:
+        data = pickle.loads(open("face_encodings/encodings", "rb").read())
+    except:
+        show_text("Problema ao carregar Banco de Dados, experimente atualizar o banco corretamente!!!")
+        return
+    
+    try:
+        video = cv2.VideoCapture(video_path)
+    except:
+        show_text(f"Problema ao carregar video {video_path}!!!")
+        return
+
+
     rotation = get_video_rotation(video_path)
     video_name =  os.path.splitext(os.path.basename(video_path))[0]
     f = open(os.path.join(exit,f"{video_name}.txt"),"w")
     print(os.path.join(exit,f"{video_name}"))
+
+    show_text(f"Identificando no vídeo {video_name}", mode=0)
 
     if(bb_flag):
         fps = video.get(cv2.CAP_PROP_FPS)
@@ -182,4 +212,6 @@ def recog_faces_in_video(video_path, bb_flag, show_text): #adicionar verificaç�
     cv2.destroyAllWindows()
     f.close()
     show_text(os.path.join(exit,f"{video_name}.txt"), mode=0)
+    imageViewerFromCommandLine = {'linux':'xdg-open','win32':'explorer','darwin':'open'}[sys.platform]
+    subprocess.run([imageViewerFromCommandLine, exit])
     return
